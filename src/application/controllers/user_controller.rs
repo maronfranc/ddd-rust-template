@@ -1,4 +1,5 @@
-use actix_web::{get, web, HttpResponse, Responder};
+use crate::application::State;
+use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
 
 use crate::application::dtos::response_message_dto::ResponseMessage;
 
@@ -8,8 +9,13 @@ pub fn load_user_controller(config: &mut web::ServiceConfig) {
 }
 
 #[get("/hello-txt/{name}")]
-async fn hello_txt(name: web::Path<String>) -> impl Responder {
+async fn hello_txt(req: HttpRequest, name: web::Path<String>) -> impl Responder {
     let msg = format!("Hello {name}");
+    let data_state = req
+        .app_data::<web::Data<State>>()
+        .expect("Global application data error");
+    println!("{:#?}", data_state);
+
     HttpResponse::Ok().body(msg)
 }
 
