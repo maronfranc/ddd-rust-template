@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use actix_web::{middleware, web, App, HttpServer};
 use load_dotenv::load_dotenv;
 use sqlx::{migrate, PgPool};
@@ -6,7 +7,7 @@ use std::env;
 use crate::application::controllers::user_controller::load_user_controller;
 
 mod application;
-// mod infrastructure;
+mod infrastructure;
 
 #[actix_web::main] // #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -21,7 +22,6 @@ async fn main() -> std::io::Result<()> {
         .run(&pool)
         .await
         .expect("Failed to migrate postgres");
-
     let address = ("127.0.0.1", 8080);
     let app_state = application::State { pool };
     println!("Server listening on {}", address.0);
