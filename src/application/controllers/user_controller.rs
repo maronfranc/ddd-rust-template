@@ -1,7 +1,9 @@
 use crate::application::State;
 use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
 
-use crate::application::dtos::response_message_dto::ResponseMessage;
+use crate::application::dtos::response_message_dto::{
+    convert_user_into_dto, DtoResponse, DtoResponseMany, DtoUser,
+};
 use crate::infrastructure::repositories::user_repository;
 
 pub fn load_user_controller(config: &mut web::ServiceConfig) {
@@ -14,30 +16,31 @@ async fn get_many(req: HttpRequest) -> impl Responder {
     let data_state = req
         .app_data::<web::Data<State>>()
         .expect("Global application data error");
-    let db_response = user_repository::find_many(&data_state.pool)
+    let db_responses = user_repository::find_many(&data_state.pool)
         .await
         .expect("Failed to select values");
-    println!("{:?}", db_response);
+    println!("{:?}", db_responses);
+    let user_dtos = db_responses
+        .into_iter()
+        .map(convert_user_into_dto)
+        .collect();
+    let response = DtoResponseMany::<DtoUser> { items: user_dtos };
 
-    let response = ResponseMessage {
-        message: "Hello many".to_string(),
-    };
     HttpResponse::Ok().json(response)
 }
 
 #[get("/{id}")]
 async fn get_by_id(req: HttpRequest, id: web::Path<i32>) -> impl Responder {
+    let id = id.into_inner();
     let data_state = req
         .app_data::<web::Data<State>>()
         .expect("Global application data error");
-    // let db_response = user_repository::find_many(&data_state.pool)
-    let db_response = user_repository::find_one(&data_state.pool, 1)
+    let db_response = user_repository::find_one(&data_state.pool, id)
         .await
         .expect("Failed to select values");
-    println!("{:#?}", db_response);
-
-    let response = ResponseMessage {
-        message: format!("Hello {id}"),
+    let response = DtoResponse::<DtoUser> {
+        item: convert_user_into_dto(db_response),
     };
+
     HttpResponse::Ok().json(response)
 }
