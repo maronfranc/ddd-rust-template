@@ -13,3 +13,7 @@ pub struct Person {
     pub last_name: String,
 }
 
+#[derive(sqlx::FromRow, Clone, Debug)]
+pub struct Id {
+    pub id: i32,
+}

@@ -7,7 +7,8 @@ mod tests {
 
     use crate::application;
     use crate::application::controllers::user_controller::load_user_controller;
-    use crate::application::dtos::response_message_dto::{DtoResponse, DtoResponseMany, DtoUser};
+    use crate::application::dtos::response_message_dto::{DtoResponse, DtoResponseMany};
+    use crate::application::dtos::user_dto::DtoUser;
 
     #[actix_web::test]
     async fn test_get_many() {
@@ -29,7 +30,6 @@ mod tests {
 
         let bytes = test::read_body(resp).await;
         let body: DtoResponseMany<DtoUser> = serde_json::from_slice(&bytes).unwrap();
-        println!("MANY:::: {:#?}", body);
         assert_ne!(body.items.len(), 0);
     }
 
