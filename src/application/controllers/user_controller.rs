@@ -1,9 +1,7 @@
 use actix_web::{get, post, web, HttpRequest, HttpResponse, Responder};
 
-use crate::application::dtos::response_message_dto::{
-    DtoResponse, DtoResponseMany, ResponseMessage,
-};
-use crate::application::dtos::user_dto::{convert_user_into_dto, DtoUser};
+use crate::application::dtos::response_message_dto::{DtoId, DtoResponse, DtoResponseMany};
+use crate::application::dtos::user_dto::{convert_user_into_dto, DtoRegisterUser, DtoUser};
 use crate::application::State;
 use crate::infrastructure::repositories::user_repository;
 
@@ -16,21 +14,16 @@ pub fn load_user_controller(config: &mut web::ServiceConfig) {
 }
 
 #[post("")]
-async fn create_one(req: HttpRequest) -> impl Responder {
+async fn create_one(req: HttpRequest, body: web::Json<DtoRegisterUser>) -> impl Responder {
     let data_state = req
         .app_data::<web::Data<State>>()
         .expect("Global application data error");
-    let user_todo = DtoUser {
-        id: 1,
-        username: "".to_string(),
-        email: "".to_string(),
-        person: None,
-    };
-    let db_response = user_repository::create_one(&data_state.pool, user_todo)
+
+    let db_response = user_repository::create_one(&data_state.pool, body.into_inner())
         .await
         .expect("Failed to select values");
-    let response = ResponseMessage {
-        message: db_response.id.to_string(),
+    let response = DtoResponse::<DtoId> {
+        item: DtoId { id: db_response.id },
     };
 
     HttpResponse::Ok().json(response)
@@ -62,6 +55,8 @@ async fn get_by_id(req: HttpRequest, id: web::Path<i32>) -> impl Responder {
     let db_response = user_repository::find_by_id(&data_state.pool, id)
         .await
         .expect("Failed to select values");
+    println!(" RPEOJSPOAJ {:#?}", db_response);
+
     let response = DtoResponse::<DtoUser> {
         item: convert_user_into_dto(db_response),
     };

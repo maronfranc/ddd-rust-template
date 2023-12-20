@@ -17,6 +17,16 @@ pub struct DtoPerson {
     pub last_name: String,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DtoRegisterUser {
+    pub username: String,
+    pub email: String,
+    pub password: String,
+    pub id_person: Option<i32>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+}
+
 pub fn convert_user_into_dto(db_user: User) -> DtoUser {
     DtoUser {
         id: db_user.id,

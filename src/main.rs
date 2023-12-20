@@ -12,8 +12,8 @@ mod infrastructure;
 #[actix_web::main] // #[tokio::main]
 async fn main() -> std::io::Result<()> {
     load_dotenv!();
-
     let db_url = env!("DATABASE_URL");
+
     let pool = PgPool::connect(db_url)
         .await
         .expect("Failed to connect to postgres");

@@ -14,3 +14,8 @@ pub struct DtoResponse<T> {
 pub struct DtoResponseMany<T> {
     pub items: Vec<T>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DtoId {
+    pub id: i32,
+}

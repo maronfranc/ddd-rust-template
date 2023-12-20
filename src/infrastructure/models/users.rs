@@ -6,6 +6,12 @@ pub struct User {
     pub person: Option<Person>,
 }
 
+#[derive(sqlx::FromRow, Clone, Debug)]
+pub struct InsertUser {
+    pub username: String,
+    pub email: String,
+}
+
 #[derive(sqlx::FromRow, sqlx::Decode, Clone, Debug)]
 pub struct Person {
     pub id: i32,
